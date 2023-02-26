@@ -71,17 +71,27 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.red,
                   ),
                   onDismissed: (direction) {
-                    setState(() {
-                      todoProvider.deleteTodo(todoItem);
-                    });
+                    context
+                        .read<TodoBloc>()
+                        .add(DeleteTodoEvent(item: todoItem));
+                    context.read<TodoBloc>().add(FetchTodoEvent());
                   },
                   child: ListTile(
                     title: Text(todoItem.title ?? ""),
                     subtitle: Text(todoItem.notes ?? ""),
                     leading: Checkbox(
                       value: todoItem.done,
-                      onChanged: (value) =>
-                          _onClickValueChaged(value ?? false, todoItem),
+                      onChanged: (value) {
+                        TodoItem newItem = TodoItem(
+                            id: todoItem.id,
+                            title: todoItem.title,
+                            notes: todoItem.notes,
+                            done: value);
+                        context
+                            .read<TodoBloc>()
+                            .add(UpdateTodoEvent(item: newItem));
+                        context.read<TodoBloc>().add(FetchTodoEvent());
+                      },
                     ),
                   ),
                 );
@@ -102,18 +112,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onFapClicked() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => AddTodoPage()))
-        .then((value) => {setState(() {})});
-  }
-
-  void _onClickValueChaged(bool isChecked, TodoItem item) async {
-    TodoItem newItem = TodoItem(
-        id: item.id, title: item.title, notes: item.notes, done: isChecked);
-    await todoProvider.updateTodo(newItem);
-    setState(() {});
-  }
-
-  Future<List<TodoItem>> _fetchTodos() async {
-    return await todoProvider.fetchTodos();
+        .push(MaterialPageRoute(builder: (context) => AddTodoPage()));
   }
 }
