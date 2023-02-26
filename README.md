@@ -1,4 +1,4 @@
-# skooldio_flutter_1
+# flutter_todolist
 
 A new Flutter project.
 
